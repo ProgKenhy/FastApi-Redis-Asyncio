@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi.responses import JSONResponse
 
+from config.auth import get_current_user
 from tasks.schemas import TaskCreate, TaskCreateResponse, TaskInfoResponse
 from tasks.service import TaskService
 from .dependencies import get_task_service
 
-task_router = APIRouter()
+task_router = APIRouter(
+    prefix="/tasks",
+    tags=["tasks"],
+    dependencies=[Depends(get_current_user)]
+)
 
 
 @task_router.post('', response_model=TaskCreateResponse)

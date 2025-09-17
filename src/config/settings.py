@@ -48,6 +48,8 @@ class Settings(MyBaseSettings):
     redis_config: RedisSettings = Field(default_factory=RedisSettings)
     celery_config: CelerySettings = Field(default_factory=CelerySettings)
 
+    SECRET_KEY: SecretStr = Field(alias="SECRET_KEY")
+    ENCODE_ALGORITHM: SecretStr = Field(alias="ENCODE_ALGORITHM")
     DEBUG: bool = Field(alias="DEBUG", default=False)
     ENVIRONMENT: str = Field(alias="ENVIRONMENT", default="development")
 

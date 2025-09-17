@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from redis.asyncio import Redis
@@ -17,7 +17,7 @@ class TaskService:
             id=task_id,
             task_name=task_data.task_name,
             assignee=task_data.assignee,
-            created_at=datetime.now(),
+            created_at=datetime.now(UTC),
         )
         await self.redis.set(
             f"task:{task_id}",

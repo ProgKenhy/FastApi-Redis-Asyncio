@@ -55,12 +55,18 @@ services:
       - "${API_PORT:-8000}:8000"
     volumes:
       - ./src:/app/src:ro
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ['CMD', 'curl', 'localhost:8000']
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
 
   worker:
     <<: *default-app
     container_name: task_worker
-    command: celery -A src.config worker -l "${CELERY_LOG_LEVEL:-info}" -P eventlet
+    command: celery -A config worker -l "${CELERY_LOG_LEVEL:-debug}" -P eventlet
     ports: []
 
 
