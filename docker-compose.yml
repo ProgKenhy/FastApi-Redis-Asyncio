@@ -1,0 +1,75 @@
+x-app: &default-app
+  build:
+    context: "."
+    target: "app"
+    args:
+      - "UID=${UID:-1000}"
+      - "GID=${GID:-1000}"
+      - "DEBUG=${DEBUG:-false}"
+  depends_on:
+    redis:
+      condition: "service_healthy"
+  env_file:
+    - ".env"
+  restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+  stop_grace_period: "3s"
+  tty: true
+  networks:
+    - app_network
+  environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - REDIS_PASS=${REDIS_PASS}
+    - REDIS_DB=0
+
+services:
+  redis:
+    image: redis:8.2.1-alpine
+    container_name: task_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - REDIS_PASS=${REDIS_PASS}
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+      - --requirepass
+      - ${REDIS_PASS}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASS}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - app_network
+
+  app:
+    <<: *default-app
+    container_name: task_app
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./src:/app/src:ro
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    <<: *default-app
+    container_name: task_worker
+    command: celery -A src.config worker -l "${CELERY_LOG_LEVEL:-info}" -P eventlet
+    ports: []
+
+
+volumes:
+  redis_data:
+    driver: local
+  celery_beat_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge
