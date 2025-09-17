@@ -34,7 +34,7 @@ class TaskService:
         if not result:
             return None
 
-        list_name, task_id = result
+        _list_name, task_id = result
         if isinstance(task_id, bytes):
             task_id = task_id.decode()
 
