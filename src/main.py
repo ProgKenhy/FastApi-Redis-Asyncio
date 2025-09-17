@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from logging import getLogger
 from logging_setup import setup_logging
+
 setup_logging()
 logger = getLogger(__name__)
 
