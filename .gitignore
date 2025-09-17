@@ -1,3 +1,4 @@
 .idea
-
+prometheus/data
+prometheus/grafana/plugins
 __pycache__
