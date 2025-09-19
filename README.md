@@ -8,3 +8,8 @@ make up
 ```bash
 python -m unittest discover -s tests -p "test.py" -v
 ```
+
+Для запуска pylint:
+```bash
+make lint
+```
