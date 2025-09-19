@@ -6,10 +6,10 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def setup_logging():
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format=LOG_FORMAT,
         datefmt=DATE_FORMAT,
     )
 
-    logging.getLogger("uvicorn.error").setLevel(logging.DEBUG)
-    logging.getLogger("uvicorn.access").setLevel(logging.DEBUG)
+    logging.getLogger("uvicorn.error").setLevel(logging.INFO)
+    logging.getLogger("uvicorn.access").setLevel(logging.INFO)

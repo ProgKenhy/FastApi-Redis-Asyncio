@@ -61,6 +61,10 @@ services:
       timeout: 5s
       start_period: 5s
       retries: 3
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
 
   worker:

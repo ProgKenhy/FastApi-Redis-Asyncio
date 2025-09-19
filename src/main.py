@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from logging import getLogger
 from logging_setup import setup_logging
+from prometheus_fastapi_instrumentator import Instrumentator
 
 setup_logging()
 logger = getLogger(__name__)
@@ -15,6 +16,7 @@ from config.router import api_router
 app = FastAPI()
 
 app.include_router(api_router)
+Instrumentator().instrument(app).expose(app)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
