@@ -5,11 +5,12 @@ services:
     ports:
       - "9080:9080"
     volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./logs:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ./configuration/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
-    privileged: true
+    privileged: false
+    user: "0"
 
   prometheus:
     image: prom/prometheus:latest
