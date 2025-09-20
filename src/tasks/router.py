@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException
 
 from config.auth import get_current_user
 from tasks.schemas import TaskCreate, TaskCreateResponse, TaskInfoResponse
@@ -16,7 +15,7 @@ task_router = APIRouter(
 @task_router.post('', response_model=TaskCreateResponse)
 async def create_task(body: TaskCreate, task_service: TaskService = Depends(get_task_service)):
     new_task = await task_service.create_task(task_data=body)
-    return TaskCreateResponse.model_validate(new_task, from_attributes=True)
+    return new_task
 
 
 @task_router.get('/{assignee}', response_model=TaskInfoResponse)
@@ -24,9 +23,9 @@ async def get_assignee_task(assignee: str, timeout: int, task_service: TaskServi
     try:
         task = await task_service.get_assignee_task(assignee=assignee, timeout=timeout)
         if not task:
-            return JSONResponse(
-                status_code=200,
-                content={"message": "Задачи нет", "task": []}
+            raise HTTPException(
+                status_code=404,
+                detail="Задачи нет для данного исполнителя"
             )
         return TaskInfoResponse(
             assignee=task.assignee,
