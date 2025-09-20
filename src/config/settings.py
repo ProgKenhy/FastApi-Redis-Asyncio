@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -16,14 +16,15 @@ class MyBaseSettings(BaseSettings):
 
 
 class RedisSettings(MyBaseSettings):
-    HOST: str = Field(alias="REDIS_HOST", default="redis")
-    PORT: int = Field(alias="REDIS_PORT", default=6379)
-    # USER: str = Field(alias="REDIS_USER")
-    PASS: SecretStr = Field(alias="REDIS_PASS", default=None)
+    REDIS_URL: RedisDsn = Field(
+        default="redis://redis:6379/0",
+        description="Redis connection URL",
+    )
 
     @property
     def sync_url(self) -> str:
-        return f"redis://:{self.PASS.get_secret_value()}@{self.HOST}:{self.PORT}/0"
+        return str(self.REDIS_URL)
+
 
 
 class CelerySettings(MyBaseSettings):
